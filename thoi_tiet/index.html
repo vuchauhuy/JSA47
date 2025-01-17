@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dự báo thời tiết</title>
+
+</head>
+<body>
+    <div class="thoitiet">
+        <div class="searchtiet" style="display:flex;margin-bottom:20px;">
+          <input type="text" class="search-bar" id="otiet" placeholder="Tìm kiếm địa điểm">
+          <button id="timtiet">Tìm</button>
+        </div>
+        <div class="weather loading">
+          <div class="city"></div>
+          <div class="temp"></div>
+          <img class="may" src="https://openweathermap.org/img/wn/04n.png" alt="" />
+          <div class="description"></div>
+          <div><span class="humidity"></span></div>
+          <div><span class="wind"></span></div>
+        </div>
+    </div>
+      
+    <style>
+    .thoitiet{
+    background:#4944de;
+    padding:20px;
+    color:#fff;
+    border-radius:10px;
+    font-family:arial;
+    font-size:20px;
+    margin: 200px;
+    width: 350px;
+    height: 250px;
+    }
+    #otiet{
+    background:#fff;
+    padding:10px;
+    width:100%;
+    border:none;
+    }
+    #timtiet{
+    background:#666;
+    border:none;
+    color:#fff;
+    }
+    </style>
+      
+    <script>
+    let weather = {
+      apiKey: "062d92a2646152d39eb7845a608226cb",   // Nhập key lấy từ openweathermap.org
+      fetchWeather: function (city) {
+        fetch(
+          "https://api.openweathermap.org/data/2.5/weather?q=" +
+            city +
+            "&lang=vi&units=metric&appid=" +
+            this.apiKey
+        )
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Không có địa điểm");
+            }
+            return response.json();
+          })
+          .then((data) => this.displayWeather(data));
+      },
+      displayWeather: function (data) {
+        const { name } = data;
+        const { icon, description } = data.weather[0];
+        const { temp, humidity } = data.main;
+        const { speed } = data.wind;
+        const { country } = data.sys;
+        document.querySelector(".city").innerText = name + " , " + country;
+        document.querySelector(".may").src = "https://openweathermap.org/img/wn/" + icon + ".png";
+        document.querySelector(".description").innerText = description;
+        document.querySelector(".temp").innerText = temp + "°C";
+        document.querySelector(".humidity").innerText =
+          "Độ ẩm: " + humidity + "%";
+        document.querySelector(".wind").innerText =
+          "Gió: " + speed + " km/h";
+      },
+      search: function () {
+        this.fetchWeather(document.querySelector(".search-bar").value);
+      },
+    };
+    
+    document.querySelector(".searchtiet button").addEventListener("click", function () {
+      weather.search();
+    });
+    
+    document
+      .querySelector(".search-bar")
+      .addEventListener("keyup", function (event) {
+        if (event.key == "Enter") {
+          weather.search();
+        }
+      });
+    weather.fetchWeather("ha noi");
+    </script>
+</body>
+</html>
